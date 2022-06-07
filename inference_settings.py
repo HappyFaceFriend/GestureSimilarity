@@ -1,3 +1,3 @@
-actions = ['rock','paper','scissors']
-sequence_counts = [3, 3, 3]
+actions = ['up','down','left','right']
+sequence_counts = [2,2,2,2]
 sample_length = 10
