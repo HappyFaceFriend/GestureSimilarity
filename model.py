@@ -23,7 +23,7 @@ class GestureEmbeddingModel(nn.Module):
 class BiEncoderModel(nn.Module):
     def __init__(self, input_size, hidden_size, embedding_size):
         super(BiEncoderModel, self).__init__()
-        self.embedding_model = GestureEmbeddingModel(input_size, hidden_size, embedding_size)
+        self.embedding = GestureEmbeddingModel(input_size, hidden_size, embedding_size)
 
     def forward(self, dataA, dataB):
         embeddingA = self.embedding(dataA)
@@ -35,7 +35,7 @@ def get_cosine_similarity(embeddingA, embeddingB):
     return (1 + cos_sim(embeddingA, embeddingB)) / 2
 
 def get_model():
-    model = BiEncoderModel(input_size, hidden_size)
+    model = BiEncoderModel(input_size, hidden_size, embedding_size)
     return model
 
 def get_embedding_model(model_states_path, input_size = input_size, hidden_size = hidden_size, embedding_size = embedding_size):

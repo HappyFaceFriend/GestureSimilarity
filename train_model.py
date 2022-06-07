@@ -18,7 +18,7 @@ PT_MODEL_PATH = os.path.join('models_pt', 'mark12-1e2-b32-layerdiff')
 train_test_ratio = 0.9
 batch_size = 1024
 learning_rate = 2e-3
-num_epoch = 150
+num_epoch = 80
 
 SAME = 1
 DIFF = 0
@@ -71,6 +71,7 @@ for action in tqdm(datas.keys()):
 shuffle(train_list)
 shuffle(test_list)
 
+
 cuda = torch.device('cuda')
 cpu = torch.device('cpu')
 
@@ -95,6 +96,7 @@ criterion = nn.BCELoss()
 best_accuracy = 0
 losses = []
 accuracies = []
+f1s = []
 model.to(device=cuda)
 for epoch in range(num_epoch):
     #Training
@@ -128,13 +130,16 @@ for epoch in range(num_epoch):
     print(f"Epoch {epoch} : F1 {f1}")
     print()
     accuracies.append(accuracy)
+    f1s.append(f1)
 
     if accuracy > best_accuracy:
         best_accuracy = accuracy
         model.to(device=cpu)
-        torch.save(model.embedding.state_dict(), os.path.join(MODEL_PATH, 'model_states.pt'))
+        torch.save(model.embedding.state_dict(), os.path.join(MODEL_PATH, 'model_states_best.pt'))
         model.to(device=cuda)
     open(os.path.join(MODEL_PATH,'train_losses.txt'),'w').write(str(losses))
     open(os.path.join(MODEL_PATH,'accuracies.txt'),'w').write(str(accuracies))
+    open(os.path.join(MODEL_PATH,'f1s.txt'),'w').write(str(f1s))
+torch.save(model.embedding.state_dict(), os.path.join(MODEL_PATH, 'model_states_last.pt'))
     
     
