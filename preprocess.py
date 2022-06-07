@@ -51,20 +51,20 @@ def get_preprocessed(sequence_data, sample_length = 10):
 #a = np.array([[0,0,0],[1,2,3],[3,2,1]])
 #print(get_preprocessed(a))
 #while True: pass
+if __name__ == "__main__":
+    DATA_PATH = os.path.join('datas_preprocessed')
+    RAW_DATA_PATH = os.path.join('datas_raw')
 
-DATA_PATH = os.path.join('datas_preprocessed')
-RAW_DATA_PATH = os.path.join('datas_raw')
+    sequence_count = 50
 
-sequence_count = 50
-
-for action in tqdm(actions):
-    try:
-        os.makedirs(os.path.join(DATA_PATH, action))
-    except:
-        pass
-    for sequence in range(sequence_count):
-        sequence_path = os.path.join(RAW_DATA_PATH, action, str(sequence)+".tsv")
-        sequence_data = pd.read_csv(sequence_path, sep='\t', header=0).to_numpy()
-        sequence_data = get_preprocessed(sequence_data)
-        new_path = os.path.join(DATA_PATH, action, str(sequence)+".tsv")
-        pd.DataFrame(sequence_data).to_csv(new_path, sep='\t', index = False)
+    for action in tqdm(actions):
+        try:
+            os.makedirs(os.path.join(DATA_PATH, action))
+        except:
+            pass
+        for sequence in range(sequence_count):
+            sequence_path = os.path.join(RAW_DATA_PATH, action, str(sequence)+".tsv")
+            sequence_data = pd.read_csv(sequence_path, sep='\t', header=0).to_numpy()
+            sequence_data = get_preprocessed(sequence_data)
+            new_path = os.path.join(DATA_PATH, action, str(sequence)+".tsv")
+            pd.DataFrame(sequence_data).to_csv(new_path, sep='\t', index = False)

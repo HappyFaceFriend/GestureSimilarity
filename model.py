@@ -60,6 +60,11 @@ def get_model():
     model = BiEncoderModel(input_size, hidden_size)
     return model
 
+def get_model(model_path):
+    model = BiEncoderModel(input_size, hidden_size)
+    model.embedding.load_state_dict(torch.load(model_path))
+    return model
+
 def get_class_model(num_labels):
     model = Classification(input_size, hidden_size, num_labels)
     return model

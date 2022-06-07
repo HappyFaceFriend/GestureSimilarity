@@ -1,0 +1,1 @@
+actions = ['rock','paper','scissors']
