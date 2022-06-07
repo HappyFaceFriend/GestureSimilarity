@@ -3,57 +3,39 @@ import numpy as np
 import mediapipe as mp
 import cv2
 import pandas as pd
-from inference_actions import actions
+import inference_settings
 from preprocess import get_preprocessed
-from model import get_model
+from model import get_embedding_model
 import torch
+
+from mediapipe_utils import draw_landmarks, extract_keypoints, mp_hand_detection
 
 RAW_DATA_PATH = os.path.join('inference_datas','raw')
 PRESET_DATA_PATH = os.path.join('inference_datas','preset')
-#규칙 : 왼손사용 / 반복동작은 한번만 / 촬영각도와 손 풀림정도, 간격 등만 바꿔가며하기
 
-sequence_count = 3
-sequence_sample_length = 10
+actions = inference_settings.actions
+sequence_counts = inference_settings.sequence_counts
+sample_length = inference_settings.sample_length
 
-for action in actions:
+for action in inference_settings.actions:
     try:
         os.makedirs(os.path.join(RAW_DATA_PATH, action))
         os.makedirs(os.path.join(PRESET_DATA_PATH, action))
-    except:
-        pass
-        
-        
+    except: pass
 
 mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
-
 capture = cv2.VideoCapture(0)
 
-def mp_hand_detection(image, model):
-    image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    image.flags.writeable = False
-    results = model.process(image)
-    image.flags.writeable = True
-    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-    return image, results
-
-def draw_landmarks(image, results):
-    if results.multi_hand_landmarks:
-        for num, hand in enumerate(results.multi_hand_landmarks):
-            mp_drawing.draw_landmarks(image, hand, mp_hands.HAND_CONNECTIONS)
-
-
-def extract_keypoints(results):
-    return np.array([[res.x, res.y, res.z] for res in results.multi_hand_landmarks[0].landmark]).flatten() if results.multi_hand_landmarks else np.zeros(21*3)
-
-model = get_model(os.path.join('models','mark14-2e3-256_128','model_states.pt')).embedding
-model.eval()
+embedding_model = get_embedding_model(os.path.join('models','mark14-2e3-256_128','model_states.pt'))
+embedding_model.eval()
 
 with mp_hands.Hands(min_detection_confidence = 0.8, min_tracking_confidence = 0.5) as hands:
     
     while capture.isOpened():
-        for action in actions:
-            for sequence in range(sequence_count):
+        for action_index in range(len(actions)):
+            action = actions[action_index]
+            for sequence in range(sequence_counts[action_index]):
                 while True:
                     ret, frame = capture.read()
                     image, results = mp_hand_detection(frame, hands)
@@ -84,7 +66,7 @@ with mp_hands.Hands(min_detection_confidence = 0.8, min_tracking_confidence = 0.
                 sequence_preset_path = os.path.join(PRESET_DATA_PATH, action, str(sequence)+".pt")
                 pd.DataFrame(sequence_datas).to_csv(sequence_path,sep='\t', index = False) 
                 inputs = get_preprocessed(sequence_datas)
-                output = model(torch.tensor(inputs, dtype = torch.float32))
+                output = embedding_model(torch.tensor(inputs, dtype = torch.float32))
                 torch.save(output, sequence_preset_path)
 
         if cv2.waitKey(10) & 0xFF == ord('q'):

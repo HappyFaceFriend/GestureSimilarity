@@ -1,10 +1,10 @@
 actions = ['good', 'bad', 'fistbump', 'hello', 'close', 'open','rocknroll',
                      'swipeLeft', 'swipeRight', '0-1', '0-2', '0-3', '0-4', 'pointLeft', 'pointRight',
                      'comeon','goaway', 'click', 'circle', 'shoot']
-'''
-actions = ['good', 'bad', 'fistbump', 'hello', 'close', 'open','rocknroll',
-                     'swipeLeft', '0-1', '0-2', '0-3', '0-4', 'pointLeft', 'pointRight',
-                      'click','shoot']'''
+
+sequence_count = 50
+sample_length = 10
+
 #actions = ['0-1', '0-2', '0-3', '0-4','open']
 #뒷모습 안찍음
 #good / bad / point : 가로계란

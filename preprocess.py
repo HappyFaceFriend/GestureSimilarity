@@ -4,14 +4,14 @@ import mediapipe as mp
 import cv2
 import pandas as pd
 from tqdm import tqdm
-from actions import actions
 import math
+import train_settings
 
 def get_frame(sequence_data, frame):
     min, max = math.floor(frame), math.ceil(frame)
     return (sequence_data[max] - sequence_data[min]) * (frame - min) + sequence_data[min]
 
-def get_preprocessed(sequence_data, sample_length = 10):
+def get_preprocessed(sequence_data, sample_length = train_settings.sample_length):
     #sample
     value = np.empty((0,len(sequence_data[0])))
     step = (len(sequence_data)-1) / (sample_length-1)
@@ -48,16 +48,13 @@ def get_preprocessed(sequence_data, sample_length = 10):
     value[0][0] -= value[0][0]
     return value
 
-#a = np.array([[0,0,0],[1,2,3],[3,2,1]])
-#print(get_preprocessed(a))
-#while True: pass
 if __name__ == "__main__":
     DATA_PATH = os.path.join('datas_preprocessed')
     RAW_DATA_PATH = os.path.join('datas_raw')
 
-    sequence_count = 50
+    sequence_count = train_settings.sequence_count
 
-    for action in tqdm(actions):
+    for action in tqdm(train_settings.actions):
         try:
             os.makedirs(os.path.join(DATA_PATH, action))
         except:
